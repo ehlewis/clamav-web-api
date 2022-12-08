@@ -3,6 +3,8 @@ import os
 from fastapi import FastAPI,File, UploadFile
 import random
 import string
+import time
+
 
 app = FastAPI()
 
@@ -27,6 +29,7 @@ def clamav_version():
 
 @app.post("/scan-file")
 def scan_file(file: UploadFile = File(...)):
+    t0= time.time()
     temp_filename = ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits , k=15))
     save_file = r"C:\\temp\\" + temp_filename
     print(file.filename + " : " + temp_filename)
@@ -54,7 +57,8 @@ def scan_file(file: UploadFile = File(...)):
     finally:
         os.remove(save_file)
         print("File: " + save_file + " removed")
-    
+    t1=time.time()
+    print(t1-t0)
     return {"result": clean_result}
 
 '''
