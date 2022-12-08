@@ -26,29 +26,40 @@ def clamav_version():
     return {clamav.version()} 
 
 @app.post("/scan-file")
-def hello(file: UploadFile = File(...)):
+def scan_file(file: UploadFile = File(...)):
     temp_filename = ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits , k=15))
     save_file = r"C:\\temp\\" + temp_filename
+    print(file.filename + " : " + temp_filename)
     try:
         contents = file.file.read()
 
         os.makedirs(os.path.dirname(save_file), exist_ok=True)
         with open(save_file, 'wb') as f:
             f.write(contents)
+        print("File: " + file.filename + " aka " + save_file + " written.")
+    except Exception as e:
+        print(e)
+        return {"message": e }
+    finally:
+        file.file.close()
+        
+    try:
         scan_results = clamav.scan(save_file)
         clean_result = scan_results.values()
-
+        print("File: " + file.filename + " aka " + save_file + " scanned.")
+        print(scan_results)
     except Exception as e:
         print(e)
         return {"message": "There was an error scanning the file " + e }
     finally:
-        file.file.close()
         os.remove(save_file)
+        print("File: " + save_file + " removed")
+    
     return {"result": clean_result}
 
 '''
 clamav = clamd.ClamdNetworkSocket()
 print(clamav.ping())
 print(clamav.version())
-print(clamav.scan(r"C:\\Users\\lab_e\\Desktop\\repos\\clamav-api\\clamapi.py"))
+print(clamav.scan(r"clamapi.py"))
 '''

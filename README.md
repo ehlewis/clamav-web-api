@@ -13,7 +13,7 @@ Either this needs to be running as a Windows service or in a terminal by running
 
 ##Run server
 
-`uvicorn main:app --reload`
+`uvicorn clamapi:app --reload`
 
 ## App Routes
 
